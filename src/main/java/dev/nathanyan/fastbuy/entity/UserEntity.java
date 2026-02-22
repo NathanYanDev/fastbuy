@@ -44,12 +44,27 @@ public class UserEntity implements UserDetails {
   @OneToMany(mappedBy = "user", fetch =  FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<OrderEntity> orders = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<AddressEntity> addresses = new ArrayList<>();
+
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private CartEntity cart;
+
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
+
+  @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+  private Instant updatedAt;
 
   @PrePersist
   protected void onCreate() {
     this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = Instant.now();
   }
 
   @Override

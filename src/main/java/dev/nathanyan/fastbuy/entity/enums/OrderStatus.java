@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrderStatus {
   PENDING("Order received, waiting for confirmation"),
-  PROCESSING("Order is being packed"),
+  AWAITING_PAYMENT("Order is awaiting payment"),
+  PAID("Order is paid"),
   SHIPPED("Order is on the way"),
   DELIVERED("Order delivered successfully"),
   CANCELLED("Order was cancelled");

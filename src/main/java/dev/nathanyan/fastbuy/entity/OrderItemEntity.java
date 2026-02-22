@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "order_item")
+@Entity(name = "order_items")
 public class OrderItemEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,7 +32,7 @@ public class OrderItemEntity {
 
   @Positive
   @Column(nullable = false)
-  private double price_at_purchase;
+  private BigDecimal unitPrice;
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
@@ -61,7 +62,7 @@ public class OrderItemEntity {
       ", order=" + (order != null ? order.getId() : null) +
       ", product=" + (product != null ? product.getId() : null) +
       ", quantity=" + quantity +
-      ", price_at_purchase=" + price_at_purchase +
+      ", price_at_purchase=" + unitPrice +
       '}';
   }
 }
