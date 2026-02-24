@@ -47,7 +47,7 @@ public class UserEntity implements UserDetails {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<AddressEntity> addresses = new ArrayList<>();
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private CartEntity cart;
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
