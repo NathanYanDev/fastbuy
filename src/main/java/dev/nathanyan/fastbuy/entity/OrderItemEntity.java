@@ -12,7 +12,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "order_items")
+@Entity(name = "order_item")
+@Table(name = "order_items")
 public class OrderItemEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

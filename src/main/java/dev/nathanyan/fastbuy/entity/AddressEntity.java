@@ -16,7 +16,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "addresses")
+@Entity(name = "address")
+@Table(name = "addresses")
 public class AddressEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

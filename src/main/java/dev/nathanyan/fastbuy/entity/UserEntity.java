@@ -17,7 +17,8 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "users")
+@Entity(name = "user")
+@Table(name = "users")
 public class UserEntity implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -46,6 +47,9 @@ public class UserEntity implements UserDetails {
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<AddressEntity> addresses = new ArrayList<>();
+
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<RefreshTokenEntity> tokens = new ArrayList<>();
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private CartEntity cart;

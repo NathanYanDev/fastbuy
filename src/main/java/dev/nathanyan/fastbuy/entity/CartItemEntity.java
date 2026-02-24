@@ -13,7 +13,8 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "cart_items")
+@Entity(name = "cart_item")
+@Table(name = "cart_items")
 public class CartItemEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
