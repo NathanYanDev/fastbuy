@@ -1,6 +1,8 @@
 package dev.nathanyan.fastbuy.config;
 
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
+import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
+import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +26,12 @@ import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
   private final AuthenticationProvider authenticationProvider;
   private final JwtAuthFilter jwtAuthFilter;
+
+  private final OAuth2UserServiceImpl oAuth2UserService;
+  private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,6 +44,7 @@ public class SecurityConfig {
         )
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService)).successHandler(oAuth2SuccessHandler))
         .build();
   }
 
