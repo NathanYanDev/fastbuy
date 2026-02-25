@@ -1,6 +1,6 @@
 package dev.nathanyan.fastbuy.security;
 
-import dev.nathanyan.fastbuy.repository.UserRepository;
+import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-  private final UserRepository userRepository;
+  private final CustomerRepository customerRepository;
 
   @NullMarked
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    return customerRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 }

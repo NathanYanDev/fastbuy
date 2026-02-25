@@ -1,6 +1,6 @@
 package dev.nathanyan.fastbuy.config;
 
-import dev.nathanyan.fastbuy.repository.UserRepository;
+import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
 import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,11 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfiguration {
-  private final UserRepository userRepository;
+  private final CustomerRepository customerRepository;
 
   @Bean
   public UserDetailsService userDetailsService() {
-    return new UserDetailsServiceImpl(userRepository);
+    return new UserDetailsServiceImpl(customerRepository);
   }
 
   @Bean
