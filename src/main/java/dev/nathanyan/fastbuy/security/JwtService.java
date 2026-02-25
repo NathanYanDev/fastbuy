@@ -1,5 +1,6 @@
 package dev.nathanyan.fastbuy.security;
 
+import dev.nathanyan.fastbuy.shared.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -25,6 +26,11 @@ public class JwtService {
   @Getter
   @Value("${security.jwt.expiration}")
   private long expiration;
+
+  @Value("${security.jwt.refresh-expiration}")
+  private long refreshTokenDurationMs;
+
+  private final RefreshTokenRepository refreshTokenRepository;
 
   private SecretKey getSecretKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secret);
@@ -79,5 +85,19 @@ public class JwtService {
 
   private Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
+  }
+
+  public String generateRefreshToken(UserDetails userDetails) {
+    return buildToken(new HashMap<>(), userDetails, refreshTokenDurationMs);
+  }
+
+  public boolean validateRefreshToken(String token, UserDetails userDetails) {
+    final String username = extractUsername(token);
+
+    boolean existsInDatabase = refreshTokenRepository.existsByTokenAndCustomer_Email(token, username);
+
+    return username.equals(userDetails.getUsername())
+        && !isTokenExpired(token)
+        && existsInDatabase;
   }
 }
