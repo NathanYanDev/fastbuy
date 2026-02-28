@@ -14,8 +14,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "variant_detail")
-@Table(name = "variant_details")
+@Entity
+@Table(name = "VARIANT_DETAIL")
 public class VariantDetailEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

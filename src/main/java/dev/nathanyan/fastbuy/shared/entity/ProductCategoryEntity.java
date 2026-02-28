@@ -11,8 +11,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "product_category")
-@Table(name = "product_categories")
+@Entity
+@Table(name = "PRODUCT_CATEGORY")
 public class ProductCategoryEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

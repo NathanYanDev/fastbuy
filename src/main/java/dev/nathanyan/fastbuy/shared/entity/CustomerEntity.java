@@ -2,10 +2,8 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import dev.nathanyan.fastbuy.shared.entity.enums.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,39 +20,31 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Entity(name = "customer")
-@Table(name = "customers")
+@Entity
+@Table(name = "CUSTOMER")
 public class CustomerEntity implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
-  @Email
-  @NotBlank
   @Column(nullable = false, unique = true)
   private String email;
 
-  @NotBlank
   @Column(nullable = false)
   private String password;
 
-  @NotBlank
   @Column(nullable = false)
   private String name;
 
-  @NotBlank
   @Column(nullable = false)
   private String document;
 
-  @NotBlank
   @Column(nullable = false)
   private String phone;
 
-  @NotNull
   @Column(nullable = false)
   private LocalDate birthDate;
 
-  @NotNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private UserRole role;
@@ -89,7 +79,7 @@ public class CustomerEntity implements UserDetails {
   }
 
   @Override
-  @NonNull
+  @NullMarked
   public Collection<? extends GrantedAuthority> getAuthorities() {
     if(this.role == UserRole.ADMIN){
       return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
@@ -98,7 +88,7 @@ public class CustomerEntity implements UserDetails {
   }
 
   @Override
-  @NonNull
+  @NullMarked
   public String getUsername() {
     return getEmail();
   }

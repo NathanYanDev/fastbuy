@@ -1,8 +1,6 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,21 +13,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "product")
-@Table(name = "products")
+@Entity
+@Table(name = "PRODUCT")
 public class ProductEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
-  @NotBlank
   @Column(nullable = false)
   private String name;
 
   @Column(columnDefinition = "TEXT")
   private String description;
 
-  @NotNull
   @Column(nullable = false)
   private Boolean active = true;
 

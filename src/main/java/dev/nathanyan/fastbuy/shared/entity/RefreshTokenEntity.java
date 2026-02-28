@@ -1,7 +1,6 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.io.Serializable;
@@ -13,13 +12,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "refresh_token")
+@Table(name = "REFRESH_TOKEN")
 public class RefreshTokenEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private String id;
 
-  @NotBlank
   @Column(nullable = false, unique = true)
   private String token;
 

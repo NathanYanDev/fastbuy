@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "cart")
-@Table(name = "carts")
+@Entity
+@Table(name = "CART")
 public class CartEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

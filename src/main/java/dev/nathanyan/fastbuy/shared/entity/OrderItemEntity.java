@@ -1,7 +1,6 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.io.Serializable;
@@ -13,8 +12,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "order_item")
-@Table(name = "order_items")
+@Entity
+@Table(name = "ORDER_ITEM")
 public class OrderItemEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,13 +27,10 @@ public class OrderItemEntity implements Serializable {
   @JoinColumn(name = "variant_id", nullable = false)
   private ProductVariantEntity variant;
 
-  @Positive
   @Column(nullable = false)
   private int quantity;
 
-  @Positive
   @Column(nullable = false)
-
   private BigDecimal unitPrice;
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")

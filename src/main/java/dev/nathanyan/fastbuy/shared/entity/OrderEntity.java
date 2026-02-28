@@ -2,9 +2,6 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import dev.nathanyan.fastbuy.shared.entity.enums.OrderStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.io.Serializable;
@@ -18,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Entity(name = "order")
-@Table(name = "orders")
+@Entity
+@Table(name = "ORDER")
 public class OrderEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,15 +29,12 @@ public class OrderEntity implements Serializable {
   @OneToMany(mappedBy = "order", fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
   private List<OrderItemEntity> items = new ArrayList<>();
 
-  @Positive
   @Column(nullable = false)
   private BigDecimal totalAmount;
 
-  @NotBlank
   @Column(nullable = false)
   private String stripePaymentIntentId;
 
-  @NotNull
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private OrderStatus orderStatus;
