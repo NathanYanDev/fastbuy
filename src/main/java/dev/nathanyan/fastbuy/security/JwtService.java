@@ -1,5 +1,8 @@
 package dev.nathanyan.fastbuy.security;
 
+import dev.nathanyan.fastbuy.shared.entity.CustomerEntity;
+import dev.nathanyan.fastbuy.shared.entity.RefreshTokenEntity;
+import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
 import dev.nathanyan.fastbuy.shared.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -9,9 +12,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +35,7 @@ public class JwtService {
   @Value("${security.jwt.refresh-expiration}")
   private long refreshTokenDurationMs;
 
+  private final CustomerRepository customerRepository;
   private final RefreshTokenRepository refreshTokenRepository;
 
   private SecretKey getSecretKey() {
@@ -80,15 +86,30 @@ public class JwtService {
   }
 
   private boolean isTokenExpired(String token) {
-    return extractExpiration(token).before(new Date());
+    return getExpirationDate(token).before(new Date());
   }
 
-  private Date extractExpiration(String token) {
+  private Date getExpirationDate(String token) {
     return extractClaim(token, Claims::getExpiration);
   }
 
   public String generateRefreshToken(UserDetails userDetails) {
     return buildToken(new HashMap<>(), userDetails, refreshTokenDurationMs);
+  }
+
+  public void saveRefreshToken(UserDetails userDetails, String refreshToken) {
+    CustomerEntity customer = customerRepository.findByEmail(userDetails.getUsername())
+        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    refreshTokenRepository.deleteByCustomer(customer);
+
+    RefreshTokenEntity token = RefreshTokenEntity.builder()
+        .token(refreshToken)
+        .customer(customer)
+        .expiresAt(Instant.now().plusMillis(refreshTokenDurationMs))
+        .build();
+
+    refreshTokenRepository.save(token);
   }
 
   public boolean validateRefreshToken(String token, UserDetails userDetails) {
