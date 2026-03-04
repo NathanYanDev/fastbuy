@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "ORDER")
+@Table(name = "ORDERS")
 public class OrderEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
