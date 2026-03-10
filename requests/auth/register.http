@@ -1,0 +1,27 @@
+POST {{baseUrl}}/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "nathan-yan@email.com",
+  "password": "senhasegura123",
+  "name": "Nathan Yan",
+  "addresses": [
+    {
+      "street": "Rua Pindamonhangaba",
+      "number": 333,
+      "zipCode": "13200-000",
+      "city": "Jaraquaquara",
+      "state": "São Paulo",
+      "country": "Brasil",
+      "isDefault": true
+    }
+  ]
+}
+
+> {%
+    client.global.set("accessToken", response.body.token);
+    client.global.set("refreshToken", response.body.refreshToken);
+%}
+
+###
