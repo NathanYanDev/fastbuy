@@ -1,8 +1,13 @@
 package dev.nathanyan.fastbuy.config;
 
+import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
+import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
+
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
 import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
 import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
-import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
-import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,17 +35,32 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http
-        .csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-            .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
-            .anyRequest().authenticated()
-        )
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(
+                    (request, response, authException) -> {
+                      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                      response.setContentType("application/json");
+                      response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    }))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(PUBLIC_ENDPOINTS)
+                    .permitAll()
+                    .requestMatchers(ADMIN_ENDPOINTS)
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated())
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-        .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService)).successHandler(oAuth2SuccessHandler))
+        .oauth2Login(
+            oauth2 ->
+                oauth2
+                    .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                    .successHandler(oAuth2SuccessHandler))
         .build();
   }
 

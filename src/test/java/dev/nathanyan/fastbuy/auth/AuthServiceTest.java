@@ -9,9 +9,11 @@ import dev.nathanyan.fastbuy.shared.dto.address.AddressDTO;
 import dev.nathanyan.fastbuy.shared.entity.CartEntity;
 import dev.nathanyan.fastbuy.shared.entity.CustomerEntity;
 import dev.nathanyan.fastbuy.shared.entity.enums.UserRole;
+import dev.nathanyan.fastbuy.shared.exception.InvalidTokenException;
 import dev.nathanyan.fastbuy.shared.exception.UserAlreadyExistsException;
 import dev.nathanyan.fastbuy.shared.repository.CartRepository;
 import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
+import dev.nathanyan.fastbuy.shared.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,9 @@ class AuthServiceTest {
 
   @Mock
   private JwtService jwtService;
+
+  @Mock
+  private RefreshTokenRepository refreshTokenRepository;
 
   @Mock
   private PasswordEncoder passwordEncoder;
@@ -211,5 +216,55 @@ class AuthServiceTest {
 
     verify(customerRepository, never()).findByEmail(any());
     verify(jwtService, never()).generateToken(any());
+  }
+
+  @Test
+  @DisplayName("Should logout user successfully")
+  void shouldLogoutUserSuccessfully() {
+    String token = "valid-jwt-token";
+
+    when(jwtService.extractUsername(token)).thenReturn(loginRequest.username());
+    when(customerRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(customer));
+
+    authService.logout(token);
+
+    verify(jwtService, times(1)).extractUsername(token);
+    verify(customerRepository, times(1)).findByEmail(loginRequest.username());
+    verify(refreshTokenRepository, times(1)).deleteByCustomer(customer);
+  }
+
+  @Test
+  @DisplayName("Should refresh token successfully")
+  void shouldRefreshTokenSuccessfully() {
+    String token = "valid-jwt-token";
+
+    when(jwtService.extractUsername(token)).thenReturn(loginRequest.username());
+    when(customerRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(customer));
+    when(jwtService.validateRefreshToken(token, customer)).thenReturn(true);
+    when(jwtService.generateToken(any())).thenReturn("new-access-token");
+    when(jwtService.generateRefreshToken(any())).thenReturn("new-refresh-token");
+    when(jwtService.getExpiration()).thenReturn(90000L);
+
+    AuthResponse authResponse = authService.refreshToken(token);
+
+    assertNotNull(authResponse);
+    assertEquals("new-access-token", authResponse.token());
+    assertEquals("new-refresh-token", authResponse.refreshToken());
+    verify(jwtService, times(1)).saveRefreshToken(any(), eq("new-refresh-token"));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when refresh token is invalid")
+  void shouldThrowExceptionWhenRefreshTokenIsInvalid() {
+    String token = "valid-jwt-token";
+
+    when(jwtService.extractUsername(token)).thenReturn(loginRequest.username());
+    when(customerRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(customer));
+    when(jwtService.validateRefreshToken(token, customer)).thenReturn(false);
+
+    assertThrows(InvalidTokenException.class, () -> authService.refreshToken(token));
+
+    verify(jwtService, never()).generateToken(any());
+    verify(jwtService, never()).saveRefreshToken(any(), any());
   }
 }

@@ -6,11 +6,10 @@ import dev.nathanyan.fastbuy.auth.dto.RegisterRequest;
 import dev.nathanyan.fastbuy.auth.service.AuthService;
 import dev.nathanyan.fastbuy.security.ApiConstants;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,7 +32,8 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String authHeader) {
+  public ResponseEntity<AuthResponse> refreshToken(
+      @RequestHeader("Authorization") String authHeader) {
     String token = authHeader.substring(7);
     AuthResponse response = authService.refreshToken(token);
 
