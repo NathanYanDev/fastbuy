@@ -1,5 +1,9 @@
 package dev.nathanyan.fastbuy.auth;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import dev.nathanyan.fastbuy.auth.dto.AuthResponse;
 import dev.nathanyan.fastbuy.auth.dto.LoginRequest;
 import dev.nathanyan.fastbuy.auth.dto.RegisterRequest;
@@ -14,6 +18,9 @@ import dev.nathanyan.fastbuy.shared.exception.UserAlreadyExistsException;
 import dev.nathanyan.fastbuy.shared.repository.CartRepository;
 import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
 import dev.nathanyan.fastbuy.shared.repository.RefreshTokenRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,35 +35,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
-  @InjectMocks
-  private AuthService authService;
+  @InjectMocks private AuthService authService;
 
-  @Mock
-  private CustomerRepository customerRepository;
+  @Mock private CustomerRepository customerRepository;
 
-  @Mock
-  private CartRepository cartRepository;
+  @Mock private CartRepository cartRepository;
 
-  @Mock
-  private AuthenticationManager authenticationManager;
+  @Mock private AuthenticationManager authenticationManager;
 
-  @Mock
-  private JwtService jwtService;
+  @Mock private JwtService jwtService;
 
-  @Mock
-  private RefreshTokenRepository refreshTokenRepository;
+  @Mock private RefreshTokenRepository refreshTokenRepository;
 
-  @Mock
-  private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
   private RegisterRequest registerRequest;
   private CustomerEntity customer;
@@ -64,48 +57,46 @@ class AuthServiceTest {
 
   @BeforeEach
   void setUp() {
-    registerRequest = new RegisterRequest(
-        "john.doe@email.com",
-        "password123",
-        "Test Customer",
-        List.of(new AddressDTO(
-            "Rua A",
-            123,
-            null,
-            "São Paulo",
-            "SP",
-            "13200-000",
-            "Brasil",
-            true)
-        )
-    );
+    registerRequest =
+        new RegisterRequest(
+            "john.doe@email.com",
+            "password123",
+            "Test Customer",
+            "935.411.347-80",
+            "(11) 99587-4754",
+            LocalDate.of(2001, 5, 1),
+            List.of(
+                new AddressDTO(
+                    "Rua A",
+                    123,
+                    null,
+                    "Bairro B",
+                    "São Paulo",
+                    "SP",
+                    "13200-000",
+                    "Brasil",
+                    true)));
 
     loginRequest = new LoginRequest("john.doe@email.com", "password123");
 
-    customer = CustomerEntity.builder()
-        .email("john.doe@email.com")
-        .name("Test Customer")
-        .role(UserRole.CUSTOMER)
-        .build();
-
+    customer =
+        CustomerEntity.builder()
+            .email("john.doe@email.com")
+            .name("Test Customer")
+            .role(UserRole.CUSTOMER)
+            .build();
   }
 
   // Register tests
   @Test
   @DisplayName("Should register customer successfully")
   void shouldRegisterCustomerSuccessfully() {
-    when(customerRepository.findByEmail(registerRequest.username()))
-        .thenReturn(Optional.empty());
-    when(passwordEncoder.encode(registerRequest.password()))
-        .thenReturn("encodedPassword");
-    when(customerRepository.save(any(CustomerEntity.class)))
-        .thenReturn(customer);
-    when(jwtService.generateToken(any()))
-        .thenReturn("jwt-token");
-    when(jwtService.generateRefreshToken(any()))
-        .thenReturn("refresh-token");
-    when(jwtService.getExpiration())
-        .thenReturn(90000L);
+    when(customerRepository.findByEmail(registerRequest.username())).thenReturn(Optional.empty());
+    when(passwordEncoder.encode(registerRequest.password())).thenReturn("encodedPassword");
+    when(customerRepository.save(any(CustomerEntity.class))).thenReturn(customer);
+    when(jwtService.generateToken(any())).thenReturn("jwt-token");
+    when(jwtService.generateRefreshToken(any())).thenReturn("refresh-token");
+    when(jwtService.getExpiration()).thenReturn(90000L);
 
     AuthResponse authResponse = authService.register(registerRequest);
 
@@ -119,7 +110,8 @@ class AuthServiceTest {
   @Test
   @DisplayName("Should throw exception when customer already exists")
   void shouldThrowExceptionWhenCustomerExists() {
-    when(customerRepository.findByEmail(registerRequest.username())).thenReturn(Optional.of(customer));
+    when(customerRepository.findByEmail(registerRequest.username()))
+        .thenReturn(Optional.of(customer));
 
     assertThrows(UserAlreadyExistsException.class, () -> authService.register(registerRequest));
 
@@ -159,12 +151,9 @@ class AuthServiceTest {
   @Test
   @DisplayName("Should encode password when registering")
   void shouldEncodePasswordWhenRegistering() {
-    when(customerRepository.findByEmail(registerRequest.username()))
-        .thenReturn(Optional.empty());
-    when(passwordEncoder.encode(registerRequest.password()))
-        .thenReturn("encodedPassword");
-    when(customerRepository.save(any(CustomerEntity.class)))
-        .thenReturn(customer);
+    when(customerRepository.findByEmail(registerRequest.username())).thenReturn(Optional.empty());
+    when(passwordEncoder.encode(registerRequest.password())).thenReturn("encodedPassword");
+    when(customerRepository.save(any(CustomerEntity.class))).thenReturn(customer);
 
     authService.register(registerRequest);
 
@@ -178,14 +167,14 @@ class AuthServiceTest {
   @Test
   @DisplayName("Should login customer successfully")
   void shouldLoginCustomerSuccessfully() {
-    when(authenticationManager.authenticate(any())).thenReturn(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+    when(authenticationManager.authenticate(any()))
+        .thenReturn(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.username(), loginRequest.password()));
     when(customerRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(customer));
-    when(jwtService.generateToken(any()))
-        .thenReturn("jwt-token");
-    when(jwtService.generateRefreshToken(any()))
-        .thenReturn("refresh-token");
-    when(jwtService.getExpiration())
-        .thenReturn(90000L);
+    when(jwtService.generateToken(any())).thenReturn("jwt-token");
+    when(jwtService.generateRefreshToken(any())).thenReturn("refresh-token");
+    when(jwtService.getExpiration()).thenReturn(90000L);
 
     AuthResponse authResponse = authService.login(loginRequest);
 
@@ -199,7 +188,10 @@ class AuthServiceTest {
   @Test
   @DisplayName("Should throw exception when user not found")
   void shouldThrowExceptionWhenUserNotFound() {
-    when(authenticationManager.authenticate(any())).thenReturn(new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+    when(authenticationManager.authenticate(any()))
+        .thenReturn(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.username(), loginRequest.password()));
     when(customerRepository.findByEmail(loginRequest.username())).thenReturn(Optional.empty());
 
     assertThrows(UsernameNotFoundException.class, () -> authService.login(loginRequest));
@@ -210,7 +202,8 @@ class AuthServiceTest {
   @Test
   @DisplayName("Should throw exception when password is wrong")
   void shouldThrowExceptionWhenPasswordIsWrong() {
-    when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad credentials"));
+    when(authenticationManager.authenticate(any()))
+        .thenThrow(new BadCredentialsException("Bad credentials"));
 
     assertThrows(BadCredentialsException.class, () -> authService.login(loginRequest));
 

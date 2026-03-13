@@ -17,6 +17,7 @@ import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import dev.nathanyan.fastbuy.shared.dto.address.AddressDTO;
 import dev.nathanyan.fastbuy.shared.exception.InvalidTokenException;
 import dev.nathanyan.fastbuy.shared.exception.UserAlreadyExistsException;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,9 +54,20 @@ class AuthControllerTest {
             "john.doe@email.com",
             "password123",
             "Test Customer",
+            "042.815.546-45",
+            "(11) 99587-4754",
+            LocalDate.of(2001, 5, 1),
             List.of(
                 new AddressDTO(
-                    "Rua A", 123, null, "São Paulo", "SP", "13200-000", "Brasil", true)));
+                    "Rua A",
+                    123,
+                    null,
+                    "Bairro B",
+                    "São Paulo",
+                    "SP",
+                    "13200-000",
+                    "Brasil",
+                    true)));
 
     loginRequest = new LoginRequest("john.doe@email.com", "password123");
   }
@@ -95,7 +107,15 @@ class AuthControllerTest {
   @Test
   @DisplayName("Should return 400 when request is invalid")
   void shouldReturn400WhenRequestIsInvalid() throws Exception {
-    RegisterRequest request = new RegisterRequest("invalid-email", "123", "", List.of());
+    RegisterRequest request =
+        new RegisterRequest(
+            "invalid-email",
+            "123",
+            "",
+            "000.000.000-00",
+            "(00) 00000-0000",
+            LocalDate.of(2001, 5, 1),
+            List.of());
 
     mockMvc
         .perform(
