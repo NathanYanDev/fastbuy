@@ -6,16 +6,21 @@ import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
 import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
 import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
+import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,9 +32,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final AuthenticationProvider authenticationProvider;
+  private final UserDetailsServiceImpl userDetailsService;
+  private final PasswordEncoder passwordEncoder;
   private final JwtAuthFilter jwtAuthFilter;
-
   private final OAuth2UserServiceImpl oAuth2UserService;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
@@ -54,7 +59,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated())
-        .authenticationProvider(authenticationProvider)
+        .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .oauth2Login(
             oauth2 ->
@@ -77,5 +82,18 @@ public class SecurityConfig {
     source.registerCorsConfiguration("/**", configuration);
 
     return source;
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+      throws Exception {
+    return config.getAuthenticationManager();
+  }
+
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    return provider;
   }
 }

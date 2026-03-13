@@ -13,14 +13,15 @@ import dev.nathanyan.fastbuy.shared.exception.UserAlreadyExistsException;
 import dev.nathanyan.fastbuy.shared.repository.CartRepository;
 import dev.nathanyan.fastbuy.shared.repository.CustomerRepository;
 import dev.nathanyan.fastbuy.shared.repository.RefreshTokenRepository;
+import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,37 +31,43 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final CartRepository cartRepository;
   private final JwtService jwtService;
-  private final AuthenticationManager authenticationManager;
   private final RefreshTokenRepository refreshTokenRepository;
 
+  @Lazy private final AuthenticationManager authenticationManager;
+
+  @Transactional
   public AuthResponse register(RegisterRequest request) {
     if (customerRepository.findByEmail(request.username()).isPresent())
       throw new UserAlreadyExistsException("User already exists" + request.username());
 
-    CustomerEntity customer = CustomerEntity
-        .builder()
-        .email(request.username())
-        .password(passwordEncoder.encode(request.password()))
-        .name(request.name())
-        .role(UserRole.CUSTOMER)
-        .build();
+    CustomerEntity customer =
+        CustomerEntity.builder()
+            .email(request.username())
+            .password(passwordEncoder.encode(request.password()))
+            .name(request.name())
+            .document(request.document())
+            .phone(request.phone())
+            .birthDate(request.birthDate())
+            .role(UserRole.CUSTOMER)
+            .build();
 
-    List<AddressEntity> addresses = request
-        .addresses()
-        .stream()
-        .map(address -> AddressEntity
-            .builder()
-            .customer(customer)
-            .street(address.street())
-            .number(address.number())
-            .complement(address.complement())
-            .city(address.city())
-            .state(address.state())
-            .zipCode(address.zipCode())
-            .country(address.country())
-            .isDefault(address.isDefault())
-            .build())
-        .toList();
+    List<AddressEntity> addresses =
+        request.addresses().stream()
+            .map(
+                address ->
+                    AddressEntity.builder()
+                        .customer(customer)
+                        .street(address.street())
+                        .number(address.number())
+                        .complement(address.complement())
+                        .neighborhood(address.neighborhood())
+                        .city(address.city())
+                        .state(address.state())
+                        .zipCode(address.zipCode())
+                        .country(address.country())
+                        .isDefault(address.isDefault())
+                        .build())
+            .toList();
 
     customer.setAddresses(addresses);
     customerRepository.save(customer);
@@ -76,10 +83,15 @@ public class AuthService {
     return new AuthResponse(jwtToken, refreshToken, jwtService.getExpiration());
   }
 
+  @Transactional
   public AuthResponse login(LoginRequest request) {
-    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
-    CustomerEntity customer = customerRepository.findByEmail(request.username()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    CustomerEntity customer =
+        customerRepository
+            .findByEmail(request.username())
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
     String jwtToken = jwtService.generateToken(customer);
     String refreshToken = jwtService.generateRefreshToken(customer);
@@ -88,9 +100,13 @@ public class AuthService {
     return new AuthResponse(jwtToken, refreshToken, jwtService.getExpiration());
   }
 
+  @Transactional
   public AuthResponse refreshToken(String token) {
     String username = jwtService.extractUsername(token);
-    CustomerEntity customer = customerRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    CustomerEntity customer =
+        customerRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
     if (!jwtService.validateRefreshToken(token, customer)) {
       throw new InvalidTokenException("Refresh token is invalid or expired");
@@ -104,10 +120,14 @@ public class AuthService {
     return new AuthResponse(newAccessToken, newRefreshToken, jwtService.getExpiration());
   }
 
+  @Transactional
   public void logout(String token) {
     String username = jwtService.extractUsername(token);
 
-    CustomerEntity customer = customerRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    CustomerEntity customer =
+        customerRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
     refreshTokenRepository.deleteByCustomer(customer);
   }
