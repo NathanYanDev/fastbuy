@@ -1,10 +1,9 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.io.Serializable;
 import java.time.Instant;
+import lombok.*;
 
 @Getter
 @Builder
@@ -28,8 +27,10 @@ public class AddressEntity implements Serializable {
   @Column(nullable = false)
   private int number;
 
-  @Column()
-  private String complement;
+  @Column() private String complement;
+
+  @Column(nullable = false)
+  private String neighborhood;
 
   @Column(nullable = false)
   private String city;
