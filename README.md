@@ -1,6 +1,7 @@
 # 🛒 FastBuy — E-commerce API
 
-A RESTful e-commerce API built with Spring Boot, featuring OAuth2 authentication with Google, JWT token management, Stripe payment integration, and a complete product catalog with variants.
+A RESTful e-commerce API built with Spring Boot, featuring OAuth2 authentication with Google, JWT token management,
+Stripe payment integration, and a complete product catalog with variants.
 
 ---
 
@@ -20,26 +21,28 @@ A RESTful e-commerce API built with Spring Boot, featuring OAuth2 authentication
 
 ## About
 
-FastBuy is a portfolio project developed to practice and demonstrate skills with the Spring ecosystem. It implements a complete e-commerce flow — from user registration and authentication to product catalog, shopping cart, and payment processing via Stripe.
+FastBuy is a portfolio project developed to practice and demonstrate skills with the Spring ecosystem. It implements a
+complete e-commerce flow — from user registration and authentication to product catalog, shopping cart, and payment
+processing via Stripe.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Language | Java 17 |
-| Framework | Spring Boot 4.0.3 |
-| Security | Spring Security + OAuth2 + JWT |
-| Database (dev) | PostgreSQL via Docker |
-| Database (prod) | Neon (PostgreSQL) |
-| ORM | Spring Data JPA + Hibernate |
-| Payment | Stripe |
-| Image Storage | Cloudinary |
-| Documentation | SpringDoc OpenAPI (Swagger) |
-| Tests | JUnit 5 + Mockito |
-| Build | Maven |
-| Infra | Docker, Railway |
+| Layer           | Technology                     |
+|-----------------|--------------------------------|
+| Language        | Java 17                        |
+| Framework       | Spring Boot 4.0.3              |
+| Security        | Spring Security + OAuth2 + JWT |
+| Database (dev)  | PostgreSQL via Docker          |
+| Database (prod) | Neon (PostgreSQL)              |
+| ORM             | Spring Data JPA + Hibernate    |
+| Payment         | Stripe                         |
+| Image Storage   | Cloudinary                     |
+| Documentation   | SpringDoc OpenAPI (Swagger)    |
+| Tests           | JUnit 5 + Mockito              |
+| Build           | Maven                          |
+| Infra           | Docker, Railway                |
 
 ---
 
@@ -54,7 +57,7 @@ fastbuy/
   order/          → order management
   cart/           → shopping cart
   payment/        → Stripe integration
-  user/           → user profile and addresses
+  customer/       → customer profile and addresses
   shared/         → entities, repositories, exceptions
   config/         → Spring configuration beans
   security/       → JWT, filters, OAuth2 handlers
@@ -63,11 +66,12 @@ fastbuy/
 ---
 
 ## Entity Diagram
+
 ![fastbuy-db-diagram.svg](docs/fastbuy-db-diagram.svg)
 
 ### Main Entities
 
-- **User** — authenticated customer, supports OAuth2 (Google) and traditional login
+- **Customer** — authenticated customer, supports OAuth2 (Google) and traditional login
 - **Address** — multiple addresses per user
 - **Cart / CartItem** — persistent shopping cart, created automatically on registration
 - **Product / ProductVariant** — product with variants (SKU, price, stock, dimensions, dynamic attributes)
@@ -164,51 +168,57 @@ CLOUDINARY_API_SECRET=
 ## API Routes
 
 ### Auth
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| POST | `/auth/register` | Register new user | Public |
-| POST | `/auth/login` | Login with email and password | Public |
-| POST | `/auth/refresh` | Refresh access token | Public |
-| POST | `/auth/logout` | Invalidate refresh token | Required |
-| GET | `/oauth2/authorization/google` | Login with Google | Public |
 
-### Users
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| GET | `/users/me` | Get authenticated user profile | Required |
-| PUT | `/users/me` | Update profile | Required |
-| POST | `/users/me/addresses` | Add address | Required |
+| Method | Route                          | Description                   | Auth     |
+|--------|--------------------------------|-------------------------------|----------|
+| POST   | `/auth/register`               | Register new user             | Public   |
+| POST   | `/auth/login`                  | Login with email and password | Public   |
+| POST   | `/auth/refresh`                | Refresh access token          | Public   |
+| POST   | `/auth/logout`                 | Invalidate refresh token      | Required |
+| GET    | `/oauth2/authorization/google` | Login with Google             | Public   |
+
+### Customer
+
+| Method | Route                     | Description                    | Auth     |
+|--------|---------------------------|--------------------------------|----------|
+| GET    | `/customers/me`           | Get authenticated user profile | Required |
+| PUT    | `/customers/me`           | Update profile                 | Required |
+| POST   | `/customers/me/addresses` | Add address                    | Required |
 
 ### Products
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| GET | `/products` | List products (paginated) | Public |
-| GET | `/products/{id}` | Get product by ID | Public |
-| POST | `/products` | Create product | Admin |
-| PUT | `/products/{id}` | Update product | Admin |
-| DELETE | `/products/{id}` | Deactivate product (soft delete) | Admin |
+
+| Method | Route            | Description                      | Auth   |
+|--------|------------------|----------------------------------|--------|
+| GET    | `/products`      | List products (paginated)        | Public |
+| GET    | `/products/{id}` | Get product by ID                | Public |
+| POST   | `/products`      | Create product                   | Admin  |
+| PUT    | `/products/{id}` | Update product                   | Admin  |
+| DELETE | `/products/{id}` | Deactivate product (soft delete) | Admin  |
 
 ### Cart
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| GET | `/cart` | Get cart of authenticated user | Required |
-| POST | `/cart/items` | Add item to cart | Required |
-| PUT | `/cart/items/{id}` | Update item quantity | Required |
-| DELETE | `/cart/items/{id}` | Remove item | Required |
-| DELETE | `/cart` | Clear cart | Required |
+
+| Method | Route              | Description                    | Auth     |
+|--------|--------------------|--------------------------------|----------|
+| GET    | `/cart`            | Get cart of authenticated user | Required |
+| POST   | `/cart/items`      | Add item to cart               | Required |
+| PUT    | `/cart/items/{id}` | Update item quantity           | Required |
+| DELETE | `/cart/items/{id}` | Remove item                    | Required |
+| DELETE | `/cart`            | Clear cart                     | Required |
 
 ### Orders
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| GET | `/orders` | List user orders | Required |
-| GET | `/orders/{id}` | Get order by ID | Required |
-| PATCH | `/orders/{id}/cancel` | Cancel order | Required |
+
+| Method | Route                 | Description      | Auth     |
+|--------|-----------------------|------------------|----------|
+| GET    | `/orders`             | List user orders | Required |
+| GET    | `/orders/{id}`        | Get order by ID  | Required |
+| PATCH  | `/orders/{id}/cancel` | Cancel order     | Required |
 
 ### Payments
-| Method | Route | Description | Auth |
-|---|---|---|---|
-| POST | `/payments/checkout` | Create PaymentIntent on Stripe | Required |
-| POST | `/payments/webhook` | Receive Stripe events | Public* |
+
+| Method | Route                | Description                    | Auth     |
+|--------|----------------------|--------------------------------|----------|
+| POST   | `/payments/checkout` | Create PaymentIntent on Stripe | Required |
+| POST   | `/payments/webhook`  | Receive Stripe events          | Public*  |
 
 > *The webhook is public but validates the `Stripe-Signature` header.
 
@@ -243,11 +253,11 @@ CLOUDINARY_API_SECRET=
 
 ### Test structure
 
-| Layer | Tool | Annotation |
-|---|---|---|
-| Service | JUnit 5 + Mockito | `@ExtendWith(MockitoExtension.class)` |
-| Repository | JUnit 5 + H2 | `@DataJpaTest` |
-| Controller | JUnit 5 + MockMvc | `@WebMvcTest` |
+| Layer      | Tool              | Annotation                            |
+|------------|-------------------|---------------------------------------|
+| Service    | JUnit 5 + Mockito | `@ExtendWith(MockitoExtension.class)` |
+| Repository | JUnit 5 + H2      | `@DataJpaTest`                        |
+| Controller | JUnit 5 + MockMvc | `@WebMvcTest`                         |
 
 ---
 
@@ -274,8 +284,10 @@ CLOUDINARY_API_SECRET=
 
 ## Author
 
-Developed by **Nathan Yan** — [GitHub](https://github.com/nathanyan) · [LinkedIn](https://linkedin.com/in/nathan-yan-alves)
+Developed by **Nathan Yan
+** — [GitHub](https://github.com/nathanyan) · [LinkedIn](https://linkedin.com/in/nathan-yan-alves)
 
 ---
 
-> This project was developed for portfolio purposes to demonstrate practical knowledge of the Spring ecosystem, security, payment integrations and software engineering best practices.
+> This project was developed for portfolio purposes to demonstrate practical knowledge of the Spring ecosystem,
+> security, payment integrations and software engineering best practices.
