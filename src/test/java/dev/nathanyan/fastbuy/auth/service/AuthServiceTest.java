@@ -1,4 +1,4 @@
-package dev.nathanyan.fastbuy.auth;
+package dev.nathanyan.fastbuy.auth.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,9 +7,8 @@ import static org.mockito.Mockito.*;
 import dev.nathanyan.fastbuy.auth.dto.AuthResponse;
 import dev.nathanyan.fastbuy.auth.dto.LoginRequest;
 import dev.nathanyan.fastbuy.auth.dto.RegisterRequest;
-import dev.nathanyan.fastbuy.auth.service.AuthService;
 import dev.nathanyan.fastbuy.security.JwtService;
-import dev.nathanyan.fastbuy.shared.dto.address.AddressDTO;
+import dev.nathanyan.fastbuy.shared.dto.address.AddressRequest;
 import dev.nathanyan.fastbuy.shared.entity.CartEntity;
 import dev.nathanyan.fastbuy.shared.entity.CustomerEntity;
 import dev.nathanyan.fastbuy.shared.entity.enums.UserRole;
@@ -66,7 +65,7 @@ class AuthServiceTest {
             "(11) 99587-4754",
             LocalDate.of(2001, 5, 1),
             List.of(
-                new AddressDTO(
+                new AddressRequest(
                     "Rua A",
                     123,
                     null,

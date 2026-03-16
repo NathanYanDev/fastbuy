@@ -1,4 +1,4 @@
-package dev.nathanyan.fastbuy.auth;
+package dev.nathanyan.fastbuy.auth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -7,14 +7,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import dev.nathanyan.fastbuy.auth.controller.AuthController;
 import dev.nathanyan.fastbuy.auth.dto.AuthResponse;
 import dev.nathanyan.fastbuy.auth.dto.LoginRequest;
 import dev.nathanyan.fastbuy.auth.dto.RegisterRequest;
 import dev.nathanyan.fastbuy.auth.service.AuthService;
 import dev.nathanyan.fastbuy.security.JwtService;
 import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
-import dev.nathanyan.fastbuy.shared.dto.address.AddressDTO;
+import dev.nathanyan.fastbuy.shared.dto.address.AddressRequest;
 import dev.nathanyan.fastbuy.shared.exception.InvalidTokenException;
 import dev.nathanyan.fastbuy.shared.exception.UserAlreadyExistsException;
 import java.time.LocalDate;
@@ -58,7 +57,7 @@ class AuthControllerTest {
             "(11) 99587-4754",
             LocalDate.of(2001, 5, 1),
             List.of(
-                new AddressDTO(
+                new AddressRequest(
                     "Rua A",
                     123,
                     null,
