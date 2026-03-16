@@ -6,7 +6,6 @@ Content-Type: application/json
 {
   "street": "Rua Atualizada",
   "number": 200,
-  "complement": null,
   "neighborhood": "Jardim Europa",
   "city": "Jundiaí",
   "state": "SP",
