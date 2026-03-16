@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import dev.nathanyan.fastbuy.shared.dto.address.AddressDTO;
+import dev.nathanyan.fastbuy.shared.dto.address.AddressRequest;
 import dev.nathanyan.fastbuy.shared.validation.annotation.CPF;
 import dev.nathanyan.fastbuy.shared.validation.annotation.PhoneNumber;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ public record RegisterRequest(
         @Size(min = 8, message = "Password must be at least 8 characters long")
         String password,
     @NotBlank(message = "Name is required")
-        @Size(min = 2, message = "Name must be at least 2 characters long")
+        @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
         String name,
     @NotBlank(message = "Document is required") @CPF String document,
     @NotBlank @PhoneNumber String phone,
@@ -34,7 +34,7 @@ public record RegisterRequest(
         @JsonSerialize(using = LocalDateSerializer.class)
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate birthDate,
-    @Valid List<AddressDTO> addresses)
+    @Valid List<AddressRequest> addresses)
     implements Serializable {
   @Serial private static final long serialVersionUID = 1002L;
 }

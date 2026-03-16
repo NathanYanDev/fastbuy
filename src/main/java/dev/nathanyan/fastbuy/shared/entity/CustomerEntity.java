@@ -2,19 +2,19 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import dev.nathanyan.fastbuy.shared.entity.enums.UserRole;
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import lombok.*;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,13 +49,21 @@ public class CustomerEntity implements UserDetails {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
-  @OneToMany(mappedBy = "customer", fetch =  FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<OrderEntity> orders = new ArrayList<>();
 
-  @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "customer",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private List<AddressEntity> addresses = new ArrayList<>();
 
-  @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "customer",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private List<RefreshTokenEntity> tokens = new ArrayList<>();
 
   @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -81,8 +89,9 @@ public class CustomerEntity implements UserDetails {
   @Override
   @NullMarked
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    if(this.role == UserRole.ADMIN){
-      return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+    if (this.role == UserRole.ADMIN) {
+      return List.of(
+          new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
     }
     return List.of(new SimpleGrantedAuthority("ROLE_USER"));
   }
@@ -111,5 +120,13 @@ public class CustomerEntity implements UserDetails {
   @Override
   public boolean isEnabled() {
     return UserDetails.super.isEnabled();
+  }
+
+  public void addAddress(AddressEntity address) {
+    this.addresses.add(address);
+  }
+
+  public void removeAddress(AddressEntity address) {
+    this.addresses.remove(address);
   }
 }

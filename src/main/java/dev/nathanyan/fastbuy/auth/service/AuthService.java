@@ -4,6 +4,7 @@ import dev.nathanyan.fastbuy.auth.dto.AuthResponse;
 import dev.nathanyan.fastbuy.auth.dto.LoginRequest;
 import dev.nathanyan.fastbuy.auth.dto.RegisterRequest;
 import dev.nathanyan.fastbuy.security.JwtService;
+import dev.nathanyan.fastbuy.shared.dto.address.AddressRequest;
 import dev.nathanyan.fastbuy.shared.entity.AddressEntity;
 import dev.nathanyan.fastbuy.shared.entity.CartEntity;
 import dev.nathanyan.fastbuy.shared.entity.CustomerEntity;
@@ -40,41 +41,10 @@ public class AuthService {
     if (customerRepository.findByEmail(request.username()).isPresent())
       throw new UserAlreadyExistsException("User already exists" + request.username());
 
-    CustomerEntity customer =
-        CustomerEntity.builder()
-            .email(request.username())
-            .password(passwordEncoder.encode(request.password()))
-            .name(request.name())
-            .document(request.document())
-            .phone(request.phone())
-            .birthDate(request.birthDate())
-            .role(UserRole.CUSTOMER)
-            .build();
-
-    List<AddressEntity> addresses =
-        request.addresses().stream()
-            .map(
-                address ->
-                    AddressEntity.builder()
-                        .customer(customer)
-                        .street(address.street())
-                        .number(address.number())
-                        .complement(address.complement())
-                        .neighborhood(address.neighborhood())
-                        .city(address.city())
-                        .state(address.state())
-                        .zipCode(address.zipCode())
-                        .country(address.country())
-                        .isDefault(address.isDefault())
-                        .build())
-            .toList();
-
-    customer.setAddresses(addresses);
+    CustomerEntity customer = buildCustomer(request);
     customerRepository.save(customer);
 
-    CartEntity cart = CartEntity.builder().customer(customer).build();
-
-    cartRepository.save(cart);
+    cartRepository.save(CartEntity.builder().customer(customer).build());
 
     String jwtToken = jwtService.generateToken(customer);
     String refreshToken = jwtService.generateRefreshToken(customer);
@@ -130,5 +100,27 @@ public class AuthService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
     refreshTokenRepository.deleteByCustomer(customer);
+  }
+
+  private CustomerEntity buildCustomer(RegisterRequest request) {
+    CustomerEntity customer =
+        CustomerEntity.builder()
+            .email(request.username())
+            .password(passwordEncoder.encode(request.password()))
+            .name(request.name())
+            .document(request.document())
+            .phone(request.phone())
+            .birthDate(request.birthDate())
+            .role(UserRole.CUSTOMER)
+            .build();
+
+    List<AddressEntity> addresses =
+        request.addresses().stream()
+            .map(address -> AddressRequest.toEntity(address, customer))
+            .toList();
+
+    customer.setAddresses(addresses);
+
+    return customer;
   }
 }
