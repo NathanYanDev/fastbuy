@@ -1,0 +1,13 @@
+### Update current user
+PUT {{baseUrl}}/customers/me
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Nathan Alves",
+  "phone": "(11) 99587-4685",
+  "birthDate": "2001-04-01"
+}
+
+###

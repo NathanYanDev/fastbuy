@@ -1,0 +1,18 @@
+### Update Address
+PUT {{baseUrl}}/customers/me/addresses/{{addressId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "street": "Rua Atualizada",
+  "number": 200,
+  "complement": null,
+  "neighborhood": "Jardim Europa",
+  "city": "Jundiaí",
+  "state": "SP",
+  "zipCode": "13201-000",
+  "country": "Brasil",
+  "isDefault": true
+}
+
+###

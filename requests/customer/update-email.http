@@ -1,0 +1,8 @@
+### Update Email
+PATCH {{baseUrl}}/customers/me/email
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+"nathan.alves@email.com"
+
+###

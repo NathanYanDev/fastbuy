@@ -2,3 +2,5 @@
 GET {{baseUrl}}/customers/me
 Accept: application/json
 Authorization: Bearer {{accessToken}}
+
+###
