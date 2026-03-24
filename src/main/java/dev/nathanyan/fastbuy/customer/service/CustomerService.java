@@ -44,11 +44,7 @@ public class CustomerService {
     CustomerEntity customer = findByEmailOrThrow(email);
 
     if (!passwordEncoder.matches(request.currentPassword(), customer.getPassword())) {
-      throw new InvalidPasswordException("Current password is incorrect");
-    }
-
-    if (passwordEncoder.matches(request.newPassword(), customer.getPassword())) {
-      throw new InvalidPasswordException("New password must be different from current password");
+      throw new InvalidPasswordException("Invalid password");
     }
 
     customer.setPassword(passwordEncoder.encode(request.newPassword()));

@@ -37,14 +37,4 @@ public class GlobalExceptionHandler {
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
   }
-
-  @ExceptionHandler(InvalidPasswordException.class)
-  public ResponseEntity<Void> handleInvalidPassword(InvalidPasswordException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-  }
-
-  @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<Void> handleResourceNotFound(ResourceNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-  }
 }
