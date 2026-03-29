@@ -1,17 +1,15 @@
 package dev.nathanyan.fastbuy.config;
 
-import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
-import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
-
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
 import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
 import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
 import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,9 +21,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
+import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
 
 @Configuration
 @EnableWebSecurity
@@ -39,18 +43,24 @@ public class SecurityConfig {
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http.csrf(AbstractHttpConfigurer::disable)
+  @Order(1)
+  public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+    var restAuthenticationEntryPoint =
+        (org.springframework.security.web.AuthenticationEntryPoint)
+            (request, response, authException) -> {
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+              response.getWriter().write("{\"error\": \"Unauthorized\"}");
+            };
+
+    RequestMatcher apiRequestMatcher = request -> request.getRequestURI().startsWith("/api/");
+
+    return http.securityMatcher(apiRequestMatcher)
+        .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
-            ex ->
-                ex.authenticationEntryPoint(
-                    (request, response, authException) -> {
-                      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                      response.setContentType("application/json");
-                      response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                    }))
+            ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(PUBLIC_ENDPOINTS)
@@ -61,6 +71,23 @@ public class SecurityConfig {
                     .authenticated())
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
+
+  @Bean
+  @Order(2)
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(PUBLIC_ENDPOINTS)
+                    .permitAll()
+                    .requestMatchers(ADMIN_ENDPOINTS)
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated())
         .oauth2Login(
             oauth2 ->
                 oauth2
