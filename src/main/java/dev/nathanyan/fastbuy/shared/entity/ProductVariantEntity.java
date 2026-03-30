@@ -2,12 +2,16 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
@@ -43,13 +47,21 @@ public class ProductVariantEntity implements Serializable {
   @Column(nullable = false)
   private Boolean active = true;
 
+  @Column(nullable = false)
+  private Boolean defaultVariant = false;
+
   @OneToOne(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
   private ProductDimensionEntity dimensions;
 
-  @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<VariantDetailEntity> details = new ArrayList<>();
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(columnDefinition = "jsonb")
+  private Map<String, String> details = new HashMap<>();
 
-  @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "variant",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private List<ProductImageEntity> images = new ArrayList<>();
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")

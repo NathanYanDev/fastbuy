@@ -2,11 +2,10 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import dev.nathanyan.fastbuy.shared.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import lombok.*;
 
 @Getter
 @Builder

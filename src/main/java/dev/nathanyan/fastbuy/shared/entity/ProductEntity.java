@@ -1,12 +1,11 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Builder
@@ -29,13 +28,24 @@ public class ProductEntity implements Serializable {
   @Column(nullable = false)
   private Boolean active = true;
 
-  @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ProductCategoryEntity> productCategories = new ArrayList<>();
+  @OneToMany(
+      mappedBy = "product",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private List<ProductCategoryEntity> categories = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy = "product",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  private List<ProductVariantEntity> variants = new ArrayList<>();
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
 
-  @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+  @Column(nullable = false, columnDefinition = "TIMESTAMP")
   private Instant updatedAt;
 
   @PrePersist

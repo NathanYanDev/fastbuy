@@ -2,13 +2,12 @@ package dev.nathanyan.fastbuy.shared.entity;
 
 import dev.nathanyan.fastbuy.shared.entity.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Builder
@@ -26,13 +25,13 @@ public class OrderEntity implements Serializable {
   @JoinColumn(name = "customer_id", nullable = false)
   private CustomerEntity customer;
 
-  @OneToMany(mappedBy = "order", fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<OrderItemEntity> items = new ArrayList<>();
 
   @Column(nullable = false)
   private BigDecimal totalAmount;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String stripePaymentIntentId;
 
   @Enumerated(EnumType.STRING)
@@ -49,7 +48,7 @@ public class OrderEntity implements Serializable {
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
 
-  @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+  @Column(nullable = false, columnDefinition = "TIMESTAMP")
   private Instant updatedAt;
 
   @PrePersist
