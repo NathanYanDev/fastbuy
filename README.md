@@ -67,7 +67,7 @@ fastbuy/
 
 ## Entity Diagram
 
-![fastbuy-db-diagram.svg](docs/fastbuy-db-diagram.svg)
+![Database diagram](docs/diagram.svg)
 
 ### Main Entities
 
