@@ -1,5 +1,6 @@
 package dev.nathanyan.fastbuy.product.controller;
 
+import dev.nathanyan.fastbuy.product.dto.ProductDetailResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductSummaryResponse;
 import dev.nathanyan.fastbuy.product.service.ProductService;
 import dev.nathanyan.fastbuy.security.ApiConstants;
@@ -25,7 +26,7 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ProductSummaryResponse> getProductById(@PathVariable String id) {
+  public ResponseEntity<ProductDetailResponse> getProductById(@PathVariable String id) {
     return ResponseEntity.ok(productService.getProductById(id));
   }
 }
