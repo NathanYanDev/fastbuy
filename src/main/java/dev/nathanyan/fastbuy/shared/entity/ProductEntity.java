@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.*;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,7 +27,7 @@ public class ProductEntity implements Serializable {
   private String description;
 
   @Column(nullable = false)
-  private Boolean active = true;
+  private Boolean isActive = true;
 
   @OneToMany(
       mappedBy = "product",
