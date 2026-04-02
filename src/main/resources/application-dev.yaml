@@ -27,3 +27,6 @@ security:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION}
     refresh-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+admin:
+  email: ${ADMIN_EMAIL:admin@fastbuy.com}
+  password: ${ADMIN_PASSWORD:admin123456}
