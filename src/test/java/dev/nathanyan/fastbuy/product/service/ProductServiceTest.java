@@ -1,22 +1,13 @@
 package dev.nathanyan.fastbuy.product.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import dev.nathanyan.fastbuy.product.dto.ProductBaseResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductDetailResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductRequest;
 import dev.nathanyan.fastbuy.product.dto.ProductSummaryResponse;
-import dev.nathanyan.fastbuy.shared.entity.CategoryEntity;
-import dev.nathanyan.fastbuy.shared.entity.ProductEntity;
-import dev.nathanyan.fastbuy.shared.entity.ProductVariantEntity;
+import dev.nathanyan.fastbuy.shared.entity.*;
 import dev.nathanyan.fastbuy.shared.exception.ResourceNotFoundException;
 import dev.nathanyan.fastbuy.shared.repository.CategoryRepository;
 import dev.nathanyan.fastbuy.shared.repository.ProductRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +20,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -46,24 +47,50 @@ class ProductServiceTest {
   void setUp() {
     category = CategoryEntity.builder().id("cat-1").name("Notebooks").build();
 
+    ProductCategoryEntity productCategory =
+        ProductCategoryEntity.builder().product(product).category(category).build();
+
+    ProductImageEntity coverImage =
+        ProductImageEntity.builder()
+            .id("img-1")
+            .url("https://cloudinary.com/image.jpg")
+            .isCover(true)
+            .displayOrder(0)
+            .build();
+
+    ProductDimensionEntity dimension =
+        ProductDimensionEntity.builder().width(10.0).height(10.0).depth(10.0).weight(10.0).build();
+
+    ProductVariantEntity variant =
+        ProductVariantEntity.builder()
+            .id("var-1")
+            .name("Dell Inspiron 15 - i7 16GB")
+            .sku("DELL-i7-16GB")
+            .price(new BigDecimal("4599.90"))
+            .currency("BRL")
+            .stockQuantity(10)
+            .active(true)
+            .defaultVariant(true)
+            .images(new ArrayList<>(List.of(coverImage)))
+            .dimensions(dimension)
+            .details(new HashMap<>())
+            .build();
+
     product =
         ProductEntity.builder()
             .id("prod-1")
             .name("Notebook Dell Inspiron")
             .description("Notebook para uso profissional")
             .isActive(true)
-            .categories(new ArrayList<>())
-            .variants(List.of(variant))
+            .variants(new ArrayList<>(List.of(variant)))
+            .categories(new ArrayList<>(List.of(productCategory)))
             .build();
-
-    variant = ProductVariantEntity.builder().id("var-1").build();
 
     productRequest =
         new ProductRequest(
             "Notebook Dell Inspiron", "Notebook para uso profissional", List.of("cat-1"));
   }
 
-  // TODO: FIX GET ALL PRODUCTS
   @Test
   @DisplayName("Should get all active products successfully")
   void shouldGetAllActiveProductsSuccessfully() {
