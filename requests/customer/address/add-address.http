@@ -1,0 +1,22 @@
+### Add Address
+POST {{baseUrl}}/customers/me/addresses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "street": "Rua das Flores",
+  "number": 100,
+  "complement": "Apto 42",
+  "neighborhood": "Centro",
+  "city": "Jundiaí",
+  "state": "SP",
+  "zipCode": "13200-000",
+  "country": "Brasil",
+  "isDefault": false
+}
+
+> {%
+    client.global.set("addressId", response.body.id);
+%}
+
+###

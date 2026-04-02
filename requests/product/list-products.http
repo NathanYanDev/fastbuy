@@ -1,0 +1,15 @@
+### List Products (default params)
+GET {{baseUrl}}/products
+Accept: application/json
+
+###
+
+### List Products (page 2, size 10, sort by name asc)
+GET {{baseUrl}}/products?page=1&size=10&sortBy=name&direction=asc
+Accept: application/json
+
+###
+
+### List Products (sort by price desc)
+GET {{baseUrl}}/products?sortBy=price&direction=desc
+Accept: application/json
