@@ -1,10 +1,14 @@
 package dev.nathanyan.fastbuy.config;
 
+import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
+import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
+
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
 import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
 import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
 import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +29,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
-
-import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
-import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
 
 @Configuration
 @EnableWebSecurity
@@ -59,8 +58,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .exceptionHandling(
-            ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(PUBLIC_ENDPOINTS)
