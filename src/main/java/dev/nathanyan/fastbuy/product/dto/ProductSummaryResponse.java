@@ -31,9 +31,7 @@ public record ProductSummaryResponse(
         product.getId(),
         product.getName(),
         product.getCategories().stream()
-            .map(
-                productCategoryEntity ->
-                    CategoryNameResponse.from(productCategoryEntity.getCategory()))
+            .map(pc -> CategoryNameResponse.from(pc.getCategory()))
             .toList(),
         VariantSummaryResponse.from(defaultVariant),
         othersVariants);
