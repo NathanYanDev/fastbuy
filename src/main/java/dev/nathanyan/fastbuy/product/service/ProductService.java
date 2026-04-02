@@ -52,7 +52,7 @@ public class ProductService {
         ProductEntity.builder()
             .name(request.name())
             .description(request.description())
-            .isActive(true)
+            .isActive(false)
             .build();
 
     List<ProductCategoryEntity> productCategories =

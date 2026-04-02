@@ -1,9 +1,12 @@
 package dev.nathanyan.fastbuy.product.controller;
 
+import dev.nathanyan.fastbuy.product.dto.ProductBaseResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductDetailResponse;
+import dev.nathanyan.fastbuy.product.dto.ProductRequest;
 import dev.nathanyan.fastbuy.product.dto.ProductSummaryResponse;
 import dev.nathanyan.fastbuy.product.service.ProductService;
 import dev.nathanyan.fastbuy.security.ApiConstants;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
   private final ProductService productService;
 
+  // TODO: Verify permissions (ADMIN)
   @GetMapping
   public ResponseEntity<Page<ProductSummaryResponse>> listProducts(
       @RequestParam(defaultValue = "0") int page,
@@ -28,5 +32,13 @@ public class ProductController {
   @GetMapping("/{id}")
   public ResponseEntity<ProductDetailResponse> getProductById(@PathVariable String id) {
     return ResponseEntity.ok(productService.getProductById(id));
+  }
+
+  @PostMapping
+  public ResponseEntity<ProductBaseResponse> createProduct(@RequestBody ProductRequest request) {
+    ProductBaseResponse response = productService.createProduct(request);
+
+    return ResponseEntity.created(URI.create(ApiConstants.VARIANT_PREFIX + "/" + response.id()))
+        .body(response);
   }
 }
