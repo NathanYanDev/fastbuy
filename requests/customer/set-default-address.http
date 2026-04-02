@@ -1,5 +1,0 @@
-### Set Default Address
-PATCH {{baseUrl}}/customers/me/addresses/{{addressId}}
-Authorization: Bearer {{accessToken}}
-
-###

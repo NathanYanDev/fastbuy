@@ -1,5 +1,0 @@
-### Delete Address
-DELETE {{baseUrl}}/customers/me/addresses/{{addressId}}
-Authorization: Bearer {{accessToken}}
-
-###
