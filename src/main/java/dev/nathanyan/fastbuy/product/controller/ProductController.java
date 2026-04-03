@@ -10,6 +10,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -18,14 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
   private final ProductService productService;
 
-  // TODO: Verify permissions (ADMIN)
   @GetMapping
   public ResponseEntity<Page<ProductSummaryResponse>> listProducts(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size,
       @RequestParam(defaultValue = "createdAt") String sortBy,
       @RequestParam(defaultValue = "desc") String direction) {
-
     return ResponseEntity.ok(productService.getAllProducts(page, size, sortBy, direction));
   }
 
@@ -35,6 +34,7 @@ public class ProductController {
   }
 
   @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductBaseResponse> createProduct(@RequestBody ProductRequest request) {
     ProductBaseResponse response = productService.createProduct(request);
 

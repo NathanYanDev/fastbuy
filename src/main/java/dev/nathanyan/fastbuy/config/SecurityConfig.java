@@ -1,6 +1,5 @@
 package dev.nathanyan.fastbuy.config;
 
-import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
 import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
 
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
@@ -18,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,6 +32,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -60,13 +61,7 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(PUBLIC_ENDPOINTS)
-                    .permitAll()
-                    .requestMatchers(ADMIN_ENDPOINTS)
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .authenticated())
+            auth -> auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll().anyRequest().authenticated())
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
@@ -79,13 +74,7 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(PUBLIC_ENDPOINTS)
-                    .permitAll()
-                    .requestMatchers(ADMIN_ENDPOINTS)
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .authenticated())
+            auth -> auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll().anyRequest().authenticated())
         .oauth2Login(
             oauth2 ->
                 oauth2
