@@ -1,5 +1,9 @@
 package dev.nathanyan.fastbuy.product.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import dev.nathanyan.fastbuy.product.dto.ProductBaseResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductDetailResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductRequest;
@@ -8,6 +12,11 @@ import dev.nathanyan.fastbuy.shared.entity.*;
 import dev.nathanyan.fastbuy.shared.exception.ResourceNotFoundException;
 import dev.nathanyan.fastbuy.shared.repository.CategoryRepository;
 import dev.nathanyan.fastbuy.shared.repository.ProductRepository;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,16 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -214,6 +213,115 @@ class ProductServiceTest {
     assertThrows(
         ResourceNotFoundException.class,
         () -> productService.createProduct(requestWithTwoCategories));
+
+    verify(productRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Should update product successfully")
+  void shouldUpdateProductSuccessfully() {
+    ProductRequest updateRequest =
+        new ProductRequest("Notebook Dell XPS", "Notebook atualizado", List.of("cat-1"));
+
+    when(productRepository.findById("prod-1")).thenReturn(Optional.of(product));
+    when(categoryRepository.findAllById(List.of("cat-1"))).thenReturn(List.of(category));
+    when(productRepository.save(any())).thenReturn(product);
+
+    ProductBaseResponse response = productService.updateProduct("prod-1", updateRequest);
+
+    assertNotNull(response);
+    verify(productRepository, times(1)).save(any());
+  }
+
+  @Test
+  @DisplayName("Should update product name and description")
+  void shouldUpdateProductNameAndDescription() {
+    ProductRequest updateRequest =
+        new ProductRequest("Notebook Dell XPS", "Descrição atualizada", List.of("cat-1"));
+
+    when(productRepository.findById("prod-1")).thenReturn(Optional.of(product));
+    when(categoryRepository.findAllById(List.of("cat-1"))).thenReturn(List.of(category));
+    when(productRepository.save(any())).thenReturn(product);
+
+    productService.updateProduct("prod-1", updateRequest);
+
+    ArgumentCaptor<ProductEntity> captor = ArgumentCaptor.forClass(ProductEntity.class);
+    verify(productRepository).save(captor.capture());
+    assertEquals("Notebook Dell XPS", captor.getValue().getName());
+    assertEquals("Descrição atualizada", captor.getValue().getDescription());
+  }
+
+  @Test
+  @DisplayName("Should replace categories on update")
+  void shouldReplaceCategoriesOnUpdate() {
+    CategoryEntity newCategory = CategoryEntity.builder().id("cat-2").name("Eletrônicos").build();
+
+    ProductRequest updateRequest =
+        new ProductRequest("Notebook Dell XPS", "Descrição", List.of("cat-2"));
+
+    when(productRepository.findById("prod-1")).thenReturn(Optional.of(product));
+    when(categoryRepository.findAllById(List.of("cat-2"))).thenReturn(List.of(newCategory));
+    when(productRepository.save(any())).thenReturn(product);
+
+    productService.updateProduct("prod-1", updateRequest);
+
+    ArgumentCaptor<ProductEntity> captor = ArgumentCaptor.forClass(ProductEntity.class);
+    verify(productRepository).save(captor.capture());
+    assertEquals(1, captor.getValue().getCategories().size());
+    assertEquals("cat-2", captor.getValue().getCategories().get(0).getCategory().getId());
+  }
+
+  @Test
+  @DisplayName("Should throw exception when product not found on update")
+  void shouldThrowExceptionWhenProductNotFoundOnUpdate() {
+    ProductRequest updateRequest =
+        new ProductRequest("Notebook Dell XPS", "Descrição", List.of("cat-1"));
+
+    when(productRepository.findById("invalid-id")).thenReturn(Optional.empty());
+
+    assertThrows(
+        ResourceNotFoundException.class,
+        () -> productService.updateProduct("invalid-id", updateRequest));
+
+    verify(productRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Should throw exception when category not found on update")
+  void shouldThrowExceptionWhenCategoryNotFoundOnUpdate() {
+    ProductRequest updateRequest =
+        new ProductRequest("Notebook Dell XPS", "Descrição", List.of("cat-1", "cat-2"));
+
+    when(productRepository.findById("prod-1")).thenReturn(Optional.of(product));
+    when(categoryRepository.findAllById(any())).thenReturn(List.of(category)); // retorna 1 de 2
+
+    assertThrows(
+        ResourceNotFoundException.class,
+        () -> productService.updateProduct("prod-1", updateRequest));
+
+    verify(productRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Should deactivate product successfully")
+  void shouldDeactivateProductSuccessfully() {
+    when(productRepository.findById("prod-1")).thenReturn(Optional.of(product));
+    when(productRepository.save(any())).thenReturn(product);
+
+    ProductBaseResponse response = productService.deleteProduct("prod-1");
+
+    assertNotNull(response);
+    ArgumentCaptor<ProductEntity> captor = ArgumentCaptor.forClass(ProductEntity.class);
+    verify(productRepository).save(captor.capture());
+    assertFalse(captor.getValue().getIsActive());
+  }
+
+  @Test
+  @DisplayName("Should throw exception when product not found on delete")
+  void shouldThrowExceptionWhenProductNotFoundOnDelete() {
+    when(productRepository.findById("invalid-id")).thenReturn(Optional.empty());
+
+    assertThrows(ResourceNotFoundException.class, () -> productService.deleteProduct("invalid-id"));
 
     verify(productRepository, never()).save(any());
   }
