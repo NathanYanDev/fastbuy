@@ -1,10 +1,13 @@
 package dev.nathanyan.fastbuy.config;
 
+import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
+
 import dev.nathanyan.fastbuy.security.JwtAuthFilter;
 import dev.nathanyan.fastbuy.security.OAuth2SuccessHandler;
 import dev.nathanyan.fastbuy.security.OAuth2UserServiceImpl;
 import dev.nathanyan.fastbuy.security.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,13 +30,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
-import static dev.nathanyan.fastbuy.security.SecurityConstants.ADMIN_ENDPOINTS;
-import static dev.nathanyan.fastbuy.security.SecurityConstants.PUBLIC_ENDPOINTS;
-
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -59,16 +59,9 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .exceptionHandling(
-            ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(PUBLIC_ENDPOINTS)
-                    .permitAll()
-                    .requestMatchers(ADMIN_ENDPOINTS)
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .authenticated())
+            auth -> auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll().anyRequest().authenticated())
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
@@ -81,13 +74,7 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(PUBLIC_ENDPOINTS)
-                    .permitAll()
-                    .requestMatchers(ADMIN_ENDPOINTS)
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .authenticated())
+            auth -> auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll().anyRequest().authenticated())
         .oauth2Login(
             oauth2 ->
                 oauth2

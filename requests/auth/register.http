@@ -1,4 +1,4 @@
-### Register
+### Register (default params)
 POST {{baseUrl}}/auth/register
 Accept: application/json
 Content-Type: application/json

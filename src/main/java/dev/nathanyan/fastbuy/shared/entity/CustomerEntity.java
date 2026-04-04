@@ -72,7 +72,7 @@ public class CustomerEntity implements UserDetails {
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
 
-  @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+  @Column(nullable = false, columnDefinition = "TIMESTAMP")
   private Instant updatedAt;
 
   @PrePersist

@@ -1,0 +1,81 @@
+### Create Product
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Notebook Dell Inspiron",
+  "description": "Notebook para uso profissional com processador Intel i7",
+  "categoryIds": [
+    "{{categoryId}}"
+  ]
+}
+
+> {%
+    client.global.set("productId", response.body.id);
+%}
+
+###
+
+### Create Product (multiple categories)
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Monitor LG UltraWide",
+  "description": "Monitor ultrawide 34 polegadas para produtividade",
+  "categoryIds": [
+    "{{categoryId}}",
+    "{{categoryId2}}"
+  ]
+}
+
+> {%
+    client.global.set("productId", response.body.id);
+%}
+
+###
+
+### Create Product (without description)
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Teclado Mecânico",
+  "description": "",
+  "categoryIds": [
+    "{{categoryId}}"
+  ]
+}
+
+###
+
+### Create Product (invalid - missing name)
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "description": "Produto sem nome",
+  "categoryIds": [
+    "{{categoryId}}"
+  ]
+}
+
+###
+
+### Create Product (invalid - missing categories)
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Produto sem categoria",
+  "description": "Descrição",
+  "categoryIds": []
+}
+
+###
