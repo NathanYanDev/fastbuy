@@ -4,6 +4,7 @@ import dev.nathanyan.fastbuy.product.dto.ProductBaseResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductDetailResponse;
 import dev.nathanyan.fastbuy.product.dto.ProductRequest;
 import dev.nathanyan.fastbuy.product.dto.ProductSummaryResponse;
+import dev.nathanyan.fastbuy.product.specification.ProductSpecification;
 import dev.nathanyan.fastbuy.shared.entity.CategoryEntity;
 import dev.nathanyan.fastbuy.shared.entity.ProductCategoryEntity;
 import dev.nathanyan.fastbuy.shared.entity.ProductEntity;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -30,7 +32,9 @@ public class ProductService {
       int page, int size, String sortBy, String direction) {
     int validatedSize = Math.min(size, 50);
     Pageable pageable = PageRequest.of(page, validatedSize, buildSort(sortBy, direction));
-    return productRepository.findAllByIsActiveTrue(pageable).map(ProductSummaryResponse::from);
+    return productRepository
+        .findAll(ProductSpecification.baseSpec(), pageable)
+        .map(ProductSummaryResponse::from);
   }
 
   public ProductDetailResponse getProductById(String id) {
@@ -38,6 +42,18 @@ public class ProductService {
         .findById(id)
         .map(ProductDetailResponse::from)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+  }
+
+  public Page<ProductSummaryResponse> searchProducts(
+      String name, String categoryId, int page, int size, String sortBy, String direction) {
+    int validatedSize = Math.min(size, 50);
+    Pageable pageable = PageRequest.of(page, validatedSize, buildSort(sortBy, direction));
+    Specification<ProductEntity> spec =
+        ProductSpecification.baseSpec()
+            .and(ProductSpecification.hasName(name))
+            .and(ProductSpecification.hasCategory(categoryId));
+
+    return productRepository.findAll(spec, pageable).map(ProductSummaryResponse::from);
   }
 
   @Transactional
@@ -66,6 +82,51 @@ public class ProductService {
 
     productRepository.save(product);
 
+    return ProductBaseResponse.from(product);
+  }
+
+  @Transactional
+  public ProductBaseResponse updateProduct(String id, ProductRequest request) {
+    ProductEntity updatedProduct =
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    List<CategoryEntity> categories = categoryRepository.findAllById(request.categoryIds());
+
+    if (categories.size() != request.categoryIds().size()) {
+      throw new ResourceNotFoundException("One or more categories not found");
+    }
+
+    updatedProduct.setName(request.name());
+    updatedProduct.setDescription(request.description());
+
+    updatedProduct.getCategories().clear();
+
+    List<ProductCategoryEntity> newCategories =
+        categories.stream()
+            .map(
+                category ->
+                    ProductCategoryEntity.builder()
+                        .product(updatedProduct)
+                        .category(category)
+                        .build())
+            .toList();
+
+    updatedProduct.setCategories(newCategories);
+
+    productRepository.save(updatedProduct);
+
+    return ProductBaseResponse.from(updatedProduct);
+  }
+
+  @Transactional
+  public ProductBaseResponse deleteProduct(String id) {
+    ProductEntity product =
+        productRepository
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    product.setIsActive(false);
+    productRepository.save(product);
     return ProductBaseResponse.from(product);
   }
 

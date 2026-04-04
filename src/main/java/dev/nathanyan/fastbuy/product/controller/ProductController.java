@@ -33,6 +33,18 @@ public class ProductController {
     return ResponseEntity.ok(productService.getProductById(id));
   }
 
+  @GetMapping("/search")
+  public ResponseEntity<Page<ProductSummaryResponse>> searchProducts(
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) String categoryId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(defaultValue = "createdAt") String sortBy,
+      @RequestParam(defaultValue = "desc") String direction) {
+    return ResponseEntity.ok(
+        productService.searchProducts(name, categoryId, page, size, sortBy, direction));
+  }
+
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<ProductBaseResponse> createProduct(@RequestBody ProductRequest request) {
@@ -40,5 +52,20 @@ public class ProductController {
 
     return ResponseEntity.created(URI.create(ApiConstants.VARIANT_PREFIX + "/" + response.id()))
         .body(response);
+  }
+
+  @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<ProductBaseResponse> updateProduct(
+      @PathVariable String id, @RequestBody ProductRequest request) {
+    ProductBaseResponse response = productService.updateProduct(id, request);
+    return ResponseEntity.ok(response);
+  }
+
+  @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<ProductBaseResponse> deleteProduct(@PathVariable String id) {
+    ProductBaseResponse response = productService.deleteProduct(id);
+    return ResponseEntity.ok(response);
   }
 }
