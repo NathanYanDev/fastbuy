@@ -1,0 +1,5 @@
+### Get all categories
+GET {{baseUrl}}/categories
+Accept: application/json
+
+###

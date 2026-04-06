@@ -1,0 +1,11 @@
+### Delete category
+DELETE {{baseUrl}}/categories/{{categoryId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Delete category (invalid ID)
+DELETE {{baseUrl}}/categories/invalid-id
+Authorization: Bearer {{accessToken}}
+
+###

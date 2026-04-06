@@ -1,0 +1,23 @@
+### Get category by ID
+GET {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+
+###
+
+### Get category by invalid ID
+GET {{baseUrl}}/categories/invalid-id
+Accept: application/json
+
+###
+
+### Search categories by name
+GET {{baseUrl}}/categories/search?name=Note
+Accept: application/json
+
+###
+
+### Search categories without filter
+GET {{baseUrl}}/categories/search
+Accept: application/json
+
+###
