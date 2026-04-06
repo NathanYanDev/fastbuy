@@ -29,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -44,7 +45,9 @@ class ProductServiceTest {
 
   @BeforeEach
   void setUp() {
-    category = CategoryEntity.builder().id("cat-1").name("Notebooks").build();
+    category = new CategoryEntity();
+    category.setId("cat-1");
+    category.setName("Notebooks");
 
     ProductCategoryEntity productCategory =
         ProductCategoryEntity.builder().product(product).category(category).build();
@@ -95,13 +98,14 @@ class ProductServiceTest {
   void shouldGetAllActiveProductsSuccessfully() {
     Page<ProductEntity> productPage = new PageImpl<>(List.of(product));
 
-    when(productRepository.findAllByIsActiveTrue(any(Pageable.class))).thenReturn(productPage);
+    when(productRepository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(productPage);
 
     Page<ProductSummaryResponse> result = productService.getAllProducts(0, 20, "createdAt", "desc");
 
     assertNotNull(result);
     assertEquals(1, result.getTotalElements());
-    verify(productRepository, times(1)).findAllByIsActiveTrue(any(Pageable.class));
+    verify(productRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
   }
 
   @Test
@@ -109,13 +113,14 @@ class ProductServiceTest {
   void shouldLimitPageSizeTo50() {
     Page<ProductEntity> productPage = new PageImpl<>(List.of());
 
-    when(productRepository.findAllByIsActiveTrue(any(Pageable.class))).thenReturn(productPage);
+    when(productRepository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(productPage);
 
     productService.getAllProducts(0, 100, "createdAt", "desc");
 
-    ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-    verify(productRepository).findAllByIsActiveTrue(captor.capture());
-    assertEquals(50, captor.getValue().getPageSize());
+    ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+    verify(productRepository).findAll(any(Specification.class), pageableCaptor.capture());
+    assertEquals(50, pageableCaptor.getValue().getPageSize());
   }
 
   @Test
@@ -123,12 +128,13 @@ class ProductServiceTest {
   void shouldFallbackToCreatedAtWhenSortByIsInvalid() {
     Page<ProductEntity> productPage = new PageImpl<>(List.of());
 
-    when(productRepository.findAllByIsActiveTrue(any(Pageable.class))).thenReturn(productPage);
+    when(productRepository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(productPage);
 
     productService.getAllProducts(0, 20, "invalidField", "desc");
 
     ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-    verify(productRepository).findAllByIsActiveTrue(captor.capture());
+    verify(productRepository).findAll(any(Specification.class), captor.capture());
     assertEquals("createdAt", captor.getValue().getSort().iterator().next().getProperty());
   }
 
@@ -137,12 +143,13 @@ class ProductServiceTest {
   void shouldSortAscendingWhenDirectionIsAsc() {
     Page<ProductEntity> productPage = new PageImpl<>(List.of());
 
-    when(productRepository.findAllByIsActiveTrue(any(Pageable.class))).thenReturn(productPage);
+    when(productRepository.findAll(any(Specification.class), any(Pageable.class)))
+        .thenReturn(productPage);
 
     productService.getAllProducts(0, 20, "name", "asc");
 
     ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-    verify(productRepository).findAllByIsActiveTrue(captor.capture());
+    verify(productRepository).findAll(any(Specification.class), captor.capture());
     assertEquals(Sort.Direction.ASC, captor.getValue().getSort().iterator().next().getDirection());
   }
 
@@ -254,7 +261,9 @@ class ProductServiceTest {
   @Test
   @DisplayName("Should replace categories on update")
   void shouldReplaceCategoriesOnUpdate() {
-    CategoryEntity newCategory = CategoryEntity.builder().id("cat-2").name("Eletrônicos").build();
+    CategoryEntity newCategory = new CategoryEntity();
+    newCategory.setId("cat-2");
+    newCategory.setName("Eletrônicos");
 
     ProductRequest updateRequest =
         new ProductRequest("Notebook Dell XPS", "Descrição", List.of("cat-2"));

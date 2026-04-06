@@ -12,6 +12,7 @@ import dev.nathanyan.fastbuy.shared.exception.ResourceNotFoundException;
 import dev.nathanyan.fastbuy.shared.repository.CategoryRepository;
 import dev.nathanyan.fastbuy.shared.repository.ProductRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -69,20 +70,16 @@ public class ProductService {
             .name(request.name())
             .description(request.description())
             .isActive(false)
+            .categories(new ArrayList<>())
             .build();
 
-    List<ProductCategoryEntity> productCategories =
-        categories.stream()
-            .map(
-                category ->
-                    ProductCategoryEntity.builder().product(product).category(category).build())
-            .toList();
+    categories.forEach(
+        category ->
+            product
+                .getCategories()
+                .add(ProductCategoryEntity.builder().product(product).category(category).build()));
 
-    product.setCategories(productCategories);
-
-    productRepository.save(product);
-
-    return ProductBaseResponse.from(product);
+    return ProductBaseResponse.from(productRepository.save(product));
   }
 
   @Transactional

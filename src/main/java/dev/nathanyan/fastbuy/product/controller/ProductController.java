@@ -50,7 +50,7 @@ public class ProductController {
   public ResponseEntity<ProductBaseResponse> createProduct(@RequestBody ProductRequest request) {
     ProductBaseResponse response = productService.createProduct(request);
 
-    return ResponseEntity.created(URI.create(ApiConstants.VARIANT_PREFIX + "/" + response.id()))
+    return ResponseEntity.created(URI.create(ApiConstants.PRODUCT_PREFIX + "/" + response.id()))
         .body(response);
   }
 

@@ -26,7 +26,6 @@ public class ProductEntity implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String description;
 
-  @Column(nullable = false)
   private Boolean isActive = true;
 
   @OneToMany(
