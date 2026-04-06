@@ -1,5 +1,6 @@
 package dev.nathanyan.fastbuy.product.dto;
 
+import dev.nathanyan.fastbuy.category.dto.CategoryNameResponse;
 import dev.nathanyan.fastbuy.shared.entity.ProductEntity;
 import dev.nathanyan.fastbuy.shared.entity.ProductVariantEntity;
 import java.io.Serial;
