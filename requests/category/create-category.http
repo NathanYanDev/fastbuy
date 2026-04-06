@@ -1,0 +1,36 @@
+### Create category
+POST {{baseUrl}}/categories
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Notebooks"
+}
+
+> {%
+    client.global.set("categoryId", response.body.id);
+%}
+
+###
+
+### Create category (duplicate - should return 409)
+POST {{baseUrl}}/categories
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Notebooks"
+}
+
+###
+
+### Create category (invalid - missing name)
+POST {{baseUrl}}/categories
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###

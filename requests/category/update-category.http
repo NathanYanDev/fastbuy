@@ -1,0 +1,21 @@
+### Update category
+PUT {{baseUrl}}/categories/{{categoryId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Notebooks e Ultrabooks"
+}
+
+###
+
+### Update category (invalid ID)
+PUT {{baseUrl}}/categories/invalid-id
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Notebooks e Ultrabooks"
+}
+
+###

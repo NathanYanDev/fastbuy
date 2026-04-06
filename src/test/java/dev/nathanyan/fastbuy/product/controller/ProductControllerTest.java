@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.nathanyan.fastbuy.BaseControllerTest;
+import dev.nathanyan.fastbuy.category.dto.CategoryNameResponse;
 import dev.nathanyan.fastbuy.product.dto.*;
 import dev.nathanyan.fastbuy.product.service.ProductService;
 import dev.nathanyan.fastbuy.shared.exception.ResourceNotFoundException;
@@ -47,7 +48,7 @@ class ProductControllerTest extends BaseControllerTest {
         new ProductSummaryResponse(
             "prod-1",
             "Notebook Dell Inspiron",
-            List.of(new CategoryNameResponse("cat-1", "Notebooks", "")),
+            List.of(new CategoryNameResponse("cat-1", "Notebooks")),
             new VariantSummaryResponse(
                 "var-1",
                 "Dell i7 16GB",
@@ -61,7 +62,7 @@ class ProductControllerTest extends BaseControllerTest {
         new ProductDetailResponse(
             "prod-1",
             "Notebook Dell Inspiron",
-            List.of(new CategoryNameResponse("cat-1", "Notebooks", "")),
+            List.of(new CategoryNameResponse("cat-1", "Notebooks")),
             List.of());
 
     productBaseResponse =
@@ -70,7 +71,7 @@ class ProductControllerTest extends BaseControllerTest {
             "Notebook Dell Inspiron",
             "Notebook para uso profissional",
             false,
-            List.of(new CategoryNameResponse("cat-1", "Notebooks", "")));
+            List.of(new CategoryNameResponse("cat-1", "Notebooks")));
 
     productRequest =
         new ProductRequest(
@@ -89,7 +90,7 @@ class ProductControllerTest extends BaseControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[0].id").value("prod-1"))
         .andExpect(jsonPath("$.content[0].name").value("Notebook Dell Inspiron"))
-        .andExpect(jsonPath("$.totalElements").value(1));
+        .andExpect(jsonPath("$.page.totalElements").value(1));
   }
 
   @Test
@@ -121,7 +122,7 @@ class ProductControllerTest extends BaseControllerTest {
         .perform(get("/api/v1/products"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content").isEmpty())
-        .andExpect(jsonPath("$.totalElements").value(0));
+        .andExpect(jsonPath("$.page.totalElements").value(0));
   }
 
   @Test

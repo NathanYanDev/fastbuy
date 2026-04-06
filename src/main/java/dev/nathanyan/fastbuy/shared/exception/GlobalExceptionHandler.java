@@ -47,4 +47,9 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Void> handleResourceNotFound(ResourceNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
   }
+
+  @ExceptionHandler(CategoryAlreadyExistsException.class)
+  public ResponseEntity<Void> handleCategoryAlreadyExists(CategoryAlreadyExistsException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+  }
 }
