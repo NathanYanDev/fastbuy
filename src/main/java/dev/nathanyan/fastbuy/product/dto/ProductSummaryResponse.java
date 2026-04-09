@@ -3,6 +3,8 @@ package dev.nathanyan.fastbuy.product.dto;
 import dev.nathanyan.fastbuy.category.dto.CategoryNameResponse;
 import dev.nathanyan.fastbuy.shared.entity.ProductEntity;
 import dev.nathanyan.fastbuy.shared.entity.ProductVariantEntity;
+import dev.nathanyan.fastbuy.variant.dto.VariantOptionResponse;
+import dev.nathanyan.fastbuy.variant.dto.VariantSummaryResponse;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

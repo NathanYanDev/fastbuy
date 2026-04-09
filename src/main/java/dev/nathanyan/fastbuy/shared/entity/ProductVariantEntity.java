@@ -1,10 +1,6 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -12,6 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Builder
@@ -45,10 +44,10 @@ public class ProductVariantEntity implements Serializable {
   private Integer stockQuantity = 0;
 
   @Column(nullable = false)
-  private Boolean active = true;
+  private Boolean isActive = true;
 
   @Column(nullable = false)
-  private Boolean defaultVariant = false;
+  private Boolean isDefaultVariant = false;
 
   @OneToOne(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
   private ProductDimensionEntity dimensions;
@@ -79,5 +78,9 @@ public class ProductVariantEntity implements Serializable {
   @PreUpdate
   protected void onUpdate() {
     this.updatedAt = Instant.now();
+  }
+
+  public void setSku(String categoryName, String productName) {
+    this.sku = String.format("%s-%s-%s", categoryName, productName, this.name);
   }
 }

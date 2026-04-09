@@ -1,10 +1,9 @@
 package dev.nathanyan.fastbuy.shared.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.io.Serializable;
 import java.time.Instant;
+import lombok.*;
 
 @Getter
 @Builder
@@ -36,6 +35,13 @@ public class ProductDimensionEntity implements Serializable {
 
   @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
   private Instant createdAt;
+
+  public ProductDimensionEntity(Double height, Double width, Double depth, Double weight) {
+    this.height = height;
+    this.width = width;
+    this.depth = depth;
+    this.weight = weight;
+  }
 
   @PrePersist
   protected void onCreate() {
