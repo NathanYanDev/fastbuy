@@ -94,7 +94,7 @@ class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("Should get all active products successfully")
+  @DisplayName("Should get all isActive products successfully")
   void shouldGetAllActiveProductsSuccessfully() {
     Page<ProductEntity> productPage = new PageImpl<>(List.of(product));
 

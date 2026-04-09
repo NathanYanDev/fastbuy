@@ -12,6 +12,7 @@ import dev.nathanyan.fastbuy.category.dto.CategoryNameResponse;
 import dev.nathanyan.fastbuy.product.dto.*;
 import dev.nathanyan.fastbuy.product.service.ProductService;
 import dev.nathanyan.fastbuy.shared.exception.ResourceNotFoundException;
+import dev.nathanyan.fastbuy.variant.dto.VariantSummaryResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
